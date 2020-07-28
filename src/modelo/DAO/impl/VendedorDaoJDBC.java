@@ -92,42 +92,74 @@ public class VendedorDaoJDBC implements VendedorDAO {
 
 	@Override
 	public List<Vendedor> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public List<Vendedor> findByDepartamento(Departamento departamento) {
-		
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
 
 			st = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName " + 
-					"FROM seller INNER JOIN department " + 
-					"ON seller.DepartmentId = department.Id " + 
-					"WHERE DepartmentId = ? " + 
-					"ORDER BY Name");
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "ORDER BY Name");
+
+			rs = st.executeQuery();
+
+			List<Vendedor> lista = new ArrayList<>();
+			Map<Integer, Departamento> map = new HashMap<>();
+
+			while (rs.next()) {
+
+				Departamento dep = map.get(rs.getInt("DepartmentId"));
+
+				if (dep == null) {
+					dep = instanciarDepartamento(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+
+				Vendedor obj = instanciarVendedor(rs, dep);
+				lista.add(obj);
+
+			}
+			return lista;
+
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+
+		} finally {
+			DB.fecharStatement(st);
+			DB.fecharResultset(rs);
+		}
+
+	}
+
+	@Override
+	public List<Vendedor> findByDepartamento(Departamento departamento) {
+
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+
+			st = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "WHERE DepartmentId = ? " + "ORDER BY Name");
 
 			st.setInt(1, departamento.getId());
 			rs = st.executeQuery();
 
 			List<Vendedor> lista = new ArrayList<>();
 			Map<Integer, Departamento> map = new HashMap<>();
-			
+
 			while (rs.next()) {
-				
+
 				Departamento dep = map.get(rs.getInt("DepartmentId"));
-				
-				if(dep == null) {
+
+				if (dep == null) {
 					dep = instanciarDepartamento(rs);
 					map.put(rs.getInt("DepartmentId"), dep);
 				}
-			
+
 				Vendedor obj = instanciarVendedor(rs, dep);
 				lista.add(obj);
-				
+
 			}
 			return lista;
 
