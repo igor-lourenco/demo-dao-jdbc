@@ -2,6 +2,7 @@ package aplicacoes;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 import modelo.DAO.DaoFactory;
 import modelo.DAO.VendedorDAO;
@@ -11,6 +12,8 @@ import modelo.entidades.Vendedor;
 public class Programa {
 
 	public static void main(String[] args) {
+
+		Scanner sc = new Scanner(System.in);
 
 		VendedorDAO vendedorDao = DaoFactory.criarVendedorDAO();
 
@@ -31,19 +34,25 @@ public class Programa {
 		for (Vendedor obj : lista) {
 			System.out.println(obj);
 		}
-		
+
 		System.out.println("\n=== TESTE 4: Vendedor insert ===");
 		Vendedor novoVendedor = new Vendedor(null, "Greg", "greg@gmail.com", new Date(), 4000.0, departamento);
 		vendedorDao.insert(novoVendedor);
 		System.out.println("Inserido!! Novo Id = " + novoVendedor.getId());
+
+		System.out.println("\n=== TESTE 5: Vendedor update ===");
+		vendedor = vendedorDao.findById(1);
+		vendedor.setNome("Martha Wayne");
+		vendedorDao.update(vendedor);
+		System.out.println("Alteração completada!! ");
 		
-	
-	
-	System.out.println("\n=== TESTE 5: Vendedor update ===");
-	vendedor = vendedorDao.findById(1);
-	vendedor.setNome("Martha Wayne");
-	vendedorDao.update(vendedor);
-	System.out.println("Alteração completada!! ");
+		System.out.println("\n=== TESTE 6: Vendedor delete ===");
+		System.out.print("Digite o Id pra ser deletado: ");
+		int id = sc.nextInt();
+		vendedorDao.deleteById(id);
+		System.out.println("Deleção completada!! ");
+		
+		sc.close();
 	}
 
 }
